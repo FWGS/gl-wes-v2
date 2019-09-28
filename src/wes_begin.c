@@ -1423,6 +1423,8 @@ const GLubyte* GL_MANGLE(glGetString) (GLenum name)
 
 void GL_MANGLE(glGetIntegerv) (GLenum pname, GLint *params)
 	{
+	if( pname ==  0x84E2 ) // GL_MAX_TEXTURE_UNITS_ARB
+		pname = GL_MAX_TEXTURE_IMAGE_UNITS;
 	wes_gl->glGetIntegerv(pname, params);
 	}
 
