@@ -331,3 +331,8 @@ gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height
     if (newdata != NULL)
         free(newdata);
 }
+
+void GL_MANGLE(glGenTextures)( GLsizei n, GLuint* textures )
+{
+    wes_gl->glGenTextures( n, textures );
+}
