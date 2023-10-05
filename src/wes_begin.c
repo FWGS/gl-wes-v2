@@ -216,8 +216,10 @@ wes_vertbuffer_flush( void )
 #else
 	wes_gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #endif
-
-	wes_gl->glDrawElements(GL_TRIANGLES, vt_vertcount, GL_UNSIGNED_SHORT, (void*)INDEX_START);
+	if( wes_gl->glDrawRangeElements )
+		wes_gl->glDrawRangeElements(GL_TRIANGLES, 0, vt_count, vt_vertcount, GL_UNSIGNED_SHORT, (void*)INDEX_START);
+	else
+		wes_gl->glDrawElements(GL_TRIANGLES, vt_vertcount, GL_UNSIGNED_SHORT, (void*)INDEX_START);
 
 	
     wes_reset();
@@ -1335,8 +1337,11 @@ GLvoid GL_MANGLE(glDrawRangeElements)( GLenum mode, GLuint start, GLuint end, GL
 	//glClientActiveTexture( GL_TEXTURE0 );
 	wes_state_update();
 	wes_validate_pointers();
-	wes_gl->glDrawElements(mode, count, type, indices);
-}
+	if( wes_gl->glDrawRangeElements )
+		wes_gl->glDrawRangeElements(mode, start, end, count, type, indices);
+	else
+		wes_gl->glDrawElements(mode, count, type, indices);
+		}
 #endif
 
 GLvoid GL_MANGLE(glFrontFace) (GLenum mode)

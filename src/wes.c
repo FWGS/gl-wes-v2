@@ -109,6 +109,7 @@ const char* glfuncnames[] =
     "glDisableVertexAttribArray",
     "glDrawArrays",
     "glDrawElements",
+    "glDrawRangeElements",
     "glEnable",
     "glEnableVertexAttribArray",
     "glFinish",
