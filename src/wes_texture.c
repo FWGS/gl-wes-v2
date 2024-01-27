@@ -122,17 +122,6 @@ wes_clear_alpha(const GLubyte* inb, GLubyte* outb, GLint size)
 }
 
 static GLvoid
-wes_convert_RGBA2RGB(const GLubyte* inb, GLubyte* outb, GLint insize, GLint outsize)
-{
-	int i, j;
-	for(i = 0, j = 0; i < insize && j < outsize; i += 4, j += 3){
-		outb[j] = inb[i];
-		outb[j + 1] = inb[i + 1];
-		outb[j + 2] = inb[i + 2];
-	}
-}
-
-static GLvoid
 wes_convert_I2LA(const GLubyte* inb, GLubyte* outb, GLint size)
 {
 	int i;
@@ -140,42 +129,6 @@ wes_convert_I2LA(const GLubyte* inb, GLubyte* outb, GLint size)
 		outb[i*2 + 1] = outb[i*2] = inb[i];
 	}
 }
-#if 0
-
-void wes_addtextureformat(GLenum internalformat)
-{
-	textureformat_t *node;
-	for( node = textureformatlist; node; node = node->next )
-		if( node->texture == wrapglState2.boundtexture ) break;
-	if( !node )
-	{
-		node = malloc( sizeof(textureformat_t));
-		node->next = textureformatlist;
-		textureformatlist = node;
-		node->texture = wrapglState2.boundtexture;
-	}
-	node->internalformat = internalformat;
-}
-
-GLenum wes_gettextureformat()
-{
-	textureformat_t *node;
-
-	for( node = textureformatlist; node; node = node->next )
-		if( node->texture == wrapglState2.boundtexture )
-			return node->internalformat;
-	return 0;
-}
-
-void wes_deletetextureformat()
-{
-	textureformat_t *node;
-
-	for( node = textureformatlist; node && node->texture != wrapglState2.boundtexture; node = node->next );
-	if( node )
-		node->internalformat = 0;
-}
-#endif
 
 GLvoid
 GL_MANGLE(glTexImage2D)(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
@@ -199,6 +152,7 @@ GL_MANGLE(glTexImage2D)(GLenum target, GLint level, GLenum internalFormat, GLsiz
 		wes_convert_I2LA((GLubyte*) pixels, (GLubyte*) data, width * height * 2);
 		format = GL_LUMINANCE_ALPHA;
 	}
+
 	if( pixels && format == GL_RGBA && (
 		internalFormat == GL_RGB ||
 		internalFormat == GL_RGB8 ||
@@ -208,16 +162,12 @@ GL_MANGLE(glTexImage2D)(GLenum target, GLint level, GLenum internalFormat, GLsiz
 		internalFormat == GL_LUMINANCE4 )) // strip alpha from texture
 	{
 		GLvoid *data2 = malloc(width * height * 4);
-		//wes_addtextureformat(internalFormat);
-		//wes_convert_RGBA2RGB((GLubyte*) data, (GLubyte*) data2, width * height * 4, width * height * 3);
 
 		wes_clear_alpha((GLubyte*) pixels, (GLubyte*) data2, width * height * 4);
 		if( data != pixels )
 			free(data);
 		data = data2;
-		//format = GL_RGBA;
 	}
-	//else wes_deletetextureformat();
 
 	wes_gl->glTexImage2D(target, level, format, width, height, 0, format, type, data);
 
@@ -276,6 +226,7 @@ GLvoid GL_MANGLE(glTexSubImage3D)( GLenum target, GLint level,
 }
 
 
+#ifdef WES_ENABLE_GLU
 static GLvoid
 wes_halveimage(GLint nw, GLint nh, GLint byteperpixel, char* data, char* newdata)
 {
@@ -287,7 +238,6 @@ wes_halveimage(GLint nw, GLint nh, GLint byteperpixel, char* data, char* newdata
     }
 }
 
-#ifdef WES_ENABLE_GLU
 GLvoid
 gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height,
                 GLenum format, GLenum type, const GLvoid *pixels )

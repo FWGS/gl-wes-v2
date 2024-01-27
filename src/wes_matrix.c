@@ -108,6 +108,7 @@ wes_transpose4(GLfloat *in, GLfloat *out)
     out[12] = in[3]; out[13] = in[7]; out[14] = in[11]; out[15] = in[15];
 }
 
+#ifdef WES_ENABLE_GLU
 static GLvoid
 normalize3(GLfloat *v)
 {
@@ -127,6 +128,7 @@ cross3(GLfloat *v1, GLfloat *v2, GLfloat *result)
     result[1] = v1[2] * v2[0] - v1[0] * v2[2];
     result[2] = v1[0] * v2[1] - v1[1] * v2[0];
 }
+#endif // WES_ENABLE_GLU
 
 static GLvoid
 wes_mul4_general(GLfloat *in0, GLfloat *in1, GLfloat *out)
