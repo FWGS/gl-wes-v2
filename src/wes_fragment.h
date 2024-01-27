@@ -25,6 +25,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define __WES_FRAGMENT_H__
 
 extern GLvoid wes_frag_build(char* buff, progstate_t *s);
-extern GLvoid wes_frag_tex(char* buff, progstate_t *s);
+extern GLint wes_frag_tex(char* buff, progstate_t *s);
 
 #endif

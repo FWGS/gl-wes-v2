@@ -78,8 +78,7 @@ GLuint ibo_id;
 //
 #endif
 
-
-GLvoid
+static GLvoid
 wes_reset( void )
 {
     int i;
@@ -355,7 +354,7 @@ GL_MANGLE(glVertex3f)(GLfloat x, GLfloat y, GLfloat z)
 }
 
 GLvoid
-GL_MANGLE(glVertex3fv)(GLfloat *v)
+GL_MANGLE(glVertex3fv)(const GLfloat *v)
 {
 	return GL_MANGLE(glVertex3f)(v[0], v[1], v[2]);
 }
@@ -567,18 +566,6 @@ GL_MANGLE(glColor3f)(GLfloat r, GLfloat g, GLfloat b)
     }
 }
 
-float ClampToFloat(GLubyte value)
-    {
-    float retval = (float)(value);
-    if (retval > 1)
-        {
-        retval = 1;
-        }
-    return retval;
-    }
-
-const GLfloat ubtofloat = 1.0f / 255.0f;
-
 GLvoid
 GL_MANGLE(glColor4ub)(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
 {
@@ -595,7 +582,7 @@ GL_MANGLE(glColor4ub)(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
 }
 
 GLvoid
-GL_MANGLE(glColor4ubv)( GLubyte *p )
+GL_MANGLE(glColor4ubv)( const GLubyte *p )
 {
 	GL_MANGLE(glColor4ub)( p[0], p[1], p[2], p[3] );
 }
@@ -1286,7 +1273,7 @@ void GL_MANGLE(glDepthFunc) (GLenum func)
 	wes_state_update();
 }
 */
-GLvoid GL_MANGLE(glPolygonMode)( void )
+GLvoid GL_MANGLE(glPolygonMode)( GLenum face, GLenum mode )
 {
 
 }
@@ -1654,12 +1641,6 @@ GLvoid
 GL_MANGLE(glPointSize)( GLfloat size )
 {
     //wes_vertbuffer_flush();
-}
-
-GLvoid
-GL_MANGLE(glPolygonMode)( GLenum face, GLenum mode )
-{
-
 }
 */
 

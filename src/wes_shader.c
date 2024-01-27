@@ -415,7 +415,7 @@ GLuint          sh_pbuffer_count;
 GLuint          sh_vertex;
 
 //function declarations:
-GLvoid
+static GLvoid
 wes_shader_error(GLuint ind)
 {
     int len;
@@ -429,7 +429,7 @@ wes_shader_error(GLuint ind)
     free(log);
 }
 
-GLvoid
+static GLvoid
 wes_program_error(GLuint ind)
 {
     int len;
@@ -442,7 +442,7 @@ wes_program_error(GLuint ind)
     free(log);
 }
 
-GLuint
+static GLuint
 wes_shader_create(const char* data, GLenum type)
 {
     GLuint  index;
@@ -474,7 +474,7 @@ wes_shader_create(const char* data, GLenum type)
 }
 
 
-GLvoid
+static GLvoid
 wes_attrib_loc(GLuint prog)
 {
     wes_gl->glBindAttribLocation(prog, WES_APOS,       "aPosition");
@@ -490,7 +490,7 @@ wes_attrib_loc(GLuint prog)
 
 
 
-GLvoid
+static GLvoid
 wes_uniform_loc(program_t *p)
 {
 #define LocateUniform(A)                                                \
@@ -564,7 +564,7 @@ wes_uniform_loc(program_t *p)
 #undef LocateUniformIndex
 }
 
-GLuint
+static GLuint
 wes_program_create(GLuint frag, GLuint vert)
 {
     GLuint  prog;
@@ -596,9 +596,9 @@ wes_program_create(GLuint frag, GLuint vert)
         wes_gl->glDeleteProgram(prog);
         return (0xFFFFFFFF);
     }
-};
+}
 
-GLvoid
+static GLvoid
 wes_build_program( progstate_t *s, program_t *p)
 {
     char frag[4096];
@@ -612,7 +612,7 @@ wes_build_program( progstate_t *s, program_t *p)
     wes_uniform_loc(p);
 }
 
-GLboolean
+static GLboolean
 wes_progstate_cmp(progstate_t* s0, progstate_t* s1)
 {
     GLint i, j;

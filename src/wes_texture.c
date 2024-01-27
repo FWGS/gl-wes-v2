@@ -86,7 +86,7 @@ GL_MANGLE(glTexParameterfv)(	GLenum target, GLenum pname, const GLfloat *params)
 	GL_MANGLE(glTexParameterf)(target, pname, params[0]);
 }
 
-GLvoid
+static GLvoid
 wes_convert_BGR2RGB(const GLubyte* inb, GLubyte* outb, GLint size)
 {
 	int i;
@@ -97,7 +97,7 @@ wes_convert_BGR2RGB(const GLubyte* inb, GLubyte* outb, GLint size)
 	}
 }
 
-GLvoid
+static GLvoid
 wes_convert_BGRA2RGBA(const GLubyte* inb, GLubyte* outb, GLint size)
 {
 	int i;
@@ -109,7 +109,7 @@ wes_convert_BGRA2RGBA(const GLubyte* inb, GLubyte* outb, GLint size)
 	}
 }
 
-GLvoid
+static GLvoid
 wes_clear_alpha(const GLubyte* inb, GLubyte* outb, GLint size)
 {
 	int i;
@@ -121,7 +121,7 @@ wes_clear_alpha(const GLubyte* inb, GLubyte* outb, GLint size)
 	}
 }
 
-GLvoid
+static GLvoid
 wes_convert_RGBA2RGB(const GLubyte* inb, GLubyte* outb, GLint insize, GLint outsize)
 {
 	int i, j;
@@ -132,7 +132,7 @@ wes_convert_RGBA2RGB(const GLubyte* inb, GLubyte* outb, GLint insize, GLint outs
 	}
 }
 
-GLvoid
+static GLvoid
 wes_convert_I2LA(const GLubyte* inb, GLubyte* outb, GLint size)
 {
 	int i;
@@ -276,7 +276,7 @@ GLvoid GL_MANGLE(glTexSubImage3D)( GLenum target, GLint level,
 }
 
 
-GLvoid
+static GLvoid
 wes_halveimage(GLint nw, GLint nh, GLint byteperpixel, char* data, char* newdata)
 {
     int i, j;

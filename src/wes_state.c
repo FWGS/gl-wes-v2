@@ -384,7 +384,7 @@ GLvoid wes_state_init( void )
 	memcpy(&wrapglState, &wrapglInitState, sizeof(wrapState));
 }
 
-const char*
+static const char*
 wes_name_envsrc(GLint param)
 {
     switch(param)
@@ -407,7 +407,7 @@ wes_name_envsrc(GLint param)
     return "ERROR";
 }
 
-const char*
+static const char*
 wes_name_envfunc(GLint param)
 {
     switch(param)
@@ -433,7 +433,7 @@ wes_name_envfunc(GLint param)
     return "ERROR";
 }
 
-GLint
+static GLint
 wes_index_envfunc(GLint param)
 {
     switch(param)
@@ -462,7 +462,7 @@ wes_index_envfunc(GLint param)
 
 }
 
-GLint
+static GLint
 wes_index_envsrc(GLint param)
 {
     switch(param)
@@ -486,7 +486,7 @@ wes_index_envsrc(GLint param)
 
 }
 
-GLint
+static GLint
 wes_index_envop(GLint param)
 {
     switch(param)
@@ -500,7 +500,7 @@ wes_index_envop(GLint param)
 
 }
 
-GLvoid
+static GLvoid
 wes_setstate_old(GLenum e, GLboolean b)
 {
     wes_vertbuffer_flush(); //TODO: check state to reduce flush call
@@ -569,7 +569,7 @@ wes_setstate_old(GLenum e, GLboolean b)
     }
 }          
 
-GLvoid wes_setstate (GLenum e, GLboolean b)
+static GLvoid wes_setstate (GLenum e, GLboolean b)
 {
     GLboolean statechanged = GL_FALSE;
     switch(e)
@@ -748,7 +748,7 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
     }    
 }
 
-GLboolean wes_getstate (GLenum e)
+static GLboolean wes_getstate (GLenum e)
 {
     switch(e)
     {
@@ -799,7 +799,7 @@ GL_MANGLE(glLightf)(GLenum light, GLenum pname, GLfloat params)
 }
 
 GLvoid
-GL_MANGLE(glLightfv)(GLenum light, GLenum pname, GLfloat *params)
+GL_MANGLE(glLightfv)(GLenum light, GLenum pname, const GLfloat *params)
 {
    GLuint ind = light - GL_LIGHT0;
    wes_vertbuffer_flush();
@@ -867,7 +867,7 @@ GL_MANGLE(glMaterialf)(GLenum face, GLenum pname, GLfloat params)
 }
 
 GLvoid
-GL_MANGLE(glMaterialfv)(GLenum face, GLenum pname, GLfloat *params)
+GL_MANGLE(glMaterialfv)(GLenum face, GLenum pname, const GLfloat *params)
 {
     wes_vertbuffer_flush();
 
@@ -950,7 +950,7 @@ GL_MANGLE(glMaterialfv)(GLenum face, GLenum pname, GLfloat *params)
 
 
 GLvoid
-GL_MANGLE(glLightModelfv)(GLenum pname, GLfloat* params)
+GL_MANGLE(glLightModelfv)(GLenum pname, const GLfloat* params)
 {
     wes_vertbuffer_flush();
 
@@ -1078,7 +1078,7 @@ GL_MANGLE(glFogf)(GLenum pname, GLfloat param)
 }
 
 GLvoid
-GL_MANGLE(glFogfv)(GLenum pname, GLfloat *param)
+GL_MANGLE(glFogfv)(GLenum pname, const GLfloat *param)
 {
     wes_vertbuffer_flush();
 
@@ -1105,7 +1105,7 @@ GL_MANGLE(glTexGeni)(GLenum coord, GLenum pname, GLint param)
 }
 
 GLvoid
-GL_MANGLE(glTexGenfv)(GLenum coord, GLenum pname, GLfloat* param)
+GL_MANGLE(glTexGenfv)(GLenum coord, GLenum pname, const GLfloat* param)
 {
     wes_vertbuffer_flush();
 

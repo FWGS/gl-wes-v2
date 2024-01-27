@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_state.h"
 #include "wes_shader.h"
 #include "wes.h"
+#include "wes_fragment.h"
 
 #define max(A, B)   ((A > B) ? A : B)
 
@@ -49,7 +50,7 @@ const char* frag_header = ""
 "    gl_FragColor = vColor;                         \n  ";
 
 
-GLint
+static GLint
 wes_frag_clipplane(char* buff, progstate_t *s)
 {
     char *str = buff;
@@ -61,7 +62,7 @@ wes_frag_clipplane(char* buff, progstate_t *s)
     return (GLint)(str - buff);
 };
 
-GLint
+static GLint
 wes_frag_fog(char* buff, progstate_t *s)
 {
     char *str = buff;
@@ -73,7 +74,7 @@ wes_frag_fog(char* buff, progstate_t *s)
     return (GLint)(str - buff);
 };
 
-GLint
+static GLint
 wes_frag_alphatest(char* buff, progstate_t *s)
 {
     char *str = buff;
@@ -113,7 +114,7 @@ wes_frag_alphatest(char* buff, progstate_t *s)
 };
 
 
-GLint
+static GLint
 wes_frag_op(char *buff, progstate_t *s, int tex, int arg)
 {
     char *str = buff;
@@ -142,7 +143,7 @@ wes_frag_op(char *buff, progstate_t *s, int tex, int arg)
 
 }
 
-GLint
+static GLint
 wes_frag_arg_obtain(char *buff, progstate_t *s, int tex, int arg, int type)
 {
     char *str = buff;
@@ -208,7 +209,7 @@ wes_frag_arg_obtain(char *buff, progstate_t *s, int tex, int arg, int type)
     return (GLint)(str - buff);
 };
 
-GLvoid
+static GLvoid
 wes_frag_nargs(progstate_t *s, GLint tex, GLint *narg_rgb, GLint *narg_alpha)
 {
     *narg_rgb = *narg_alpha = 0;
@@ -261,7 +262,7 @@ wes_frag_nargs(progstate_t *s, GLint tex, GLint *narg_rgb, GLint *narg_alpha)
     }
 }
 
-GLint
+static GLint
 wes_frag_args(char *buff, progstate_t *s, int tex)
 {
     char *str = buff;
@@ -297,7 +298,7 @@ wes_frag_args(char *buff, progstate_t *s, int tex)
     return (GLint)(str - buff);
 }
 
-GLint
+static GLint
 wes_frag_combine(char *buff, progstate_t *s, int tex)
 {
     char *str  = buff;
@@ -451,7 +452,7 @@ wes_frag_combine(char *buff, progstate_t *s, int tex)
     return (GLint)(str - buff);
 }
 
-GLint
+static GLint
 wes_frag_tex_obtain(char* buff, progstate_t *s){
     char *str = buff;
     GLint i, j, narg_rgb = 0, narg_alpha = 0;
