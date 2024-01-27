@@ -983,8 +983,7 @@ GL_MANGLE(glPopMatrix)( void )
     }
 }
 
-
-
+#ifdef WES_ENABLE_GLU
 GLvoid
 gluOrtho2D(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top)
 {
@@ -1091,4 +1090,4 @@ gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
     memcpy(m_current->data, tmp, 12 * sizeof(GLfloat));
     GL_MANGLE(glTranslatef)(-eyex, -eyey, -eyez);
 }
-
+#endif // WES_ENABLE_GLU

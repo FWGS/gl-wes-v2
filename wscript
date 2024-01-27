@@ -15,6 +15,10 @@ def configure(conf):
 	if conf.env.DEST_OS2 == 'android':
 		conf.check_cc(lib='log')
 	conf.define('WES_MANGLE_PREPEND', 1)
+
+	# Xash3D doesn't use GLU
+	# conf.define('WES_ENABLE_GLU', 1)
+
 	conf.define('REF_DLL', 1)
 	return
 

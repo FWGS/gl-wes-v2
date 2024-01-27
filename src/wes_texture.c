@@ -287,6 +287,7 @@ wes_halveimage(GLint nw, GLint nh, GLint byteperpixel, char* data, char* newdata
     }
 }
 
+#ifdef WES_ENABLE_GLU
 GLvoid
 gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height,
                 GLenum format, GLenum type, const GLvoid *pixels )
@@ -331,6 +332,7 @@ gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height
     if (newdata != NULL)
         free(newdata);
 }
+#endif // WES_ENABLE_GLU
 
 void GL_MANGLE(glGenTextures)( GLsizei n, GLuint* textures )
 {
