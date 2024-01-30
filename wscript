@@ -24,7 +24,7 @@ def configure(conf):
 
 def build(bld):
 	source = bld.path.ant_glob(['src/*.c'])
-	libs = []
+	libs = ['werror']
 	if bld.env.DEST_OS2 == 'android':
 		libs += ['LOG']
 	includes = ['src/']
