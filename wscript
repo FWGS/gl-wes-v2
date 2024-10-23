@@ -32,7 +32,6 @@ def build(bld):
 	bld.stlib(
 		source   = source,
 		target   = 'gl-wes-v2',
-		features = 'c',
 		includes = includes,
 		use      = libs,
 		subsystem = bld.env.MSVC_SUBSYSTEM
