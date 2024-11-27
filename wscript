@@ -33,6 +33,5 @@ def build(bld):
 		source   = source,
 		target   = 'gl-wes-v2',
 		includes = includes,
-		use      = libs,
-		subsystem = bld.env.MSVC_SUBSYSTEM
+		use      = libs
 	)
