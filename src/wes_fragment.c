@@ -1,5 +1,5 @@
 /*
-GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -24,10 +24,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes.h"
 #include "wes_state.h"
 #include "wes_shader.h"
-#include "wes.h"
 #include "wes_fragment.h"
 
-#define max(A, B)   ((A > B) ? A : B)
+#undef max
+inline static int max(int A, int B){return (A > B) ? A : B;}
 
 const char* frag_header = ""
 //						  "#define highp\n#define lowp\n#define mediump                         \n  "

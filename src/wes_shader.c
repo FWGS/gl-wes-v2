@@ -1,5 +1,5 @@
 /*
-GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -425,7 +425,7 @@ wes_shader_error(GLuint ind)
     log = (char*) malloc(len + 1);
     memset(log, 0, len+1);
     wes_gl->glGetShaderInfoLog(ind, len, &i, log);
-    PRINT_ERROR("\nShader Error: %s", log);
+    PRINT_ERROR("Shader Error: %s\n", log);
     free(log);
 }
 
@@ -438,7 +438,7 @@ wes_program_error(GLuint ind)
     wes_gl->glGetProgramiv(ind, GL_INFO_LOG_LENGTH, &len);
     log = (char*) malloc(len * sizeof(char));
     wes_gl->glGetProgramInfoLog(ind, len, &i, log);
-    PRINT_ERROR("\nProgram Error: %s", log);
+    PRINT_ERROR("Program Error: %s\n", log);
     free(log);
 }
 
@@ -448,29 +448,28 @@ wes_shader_create(const char* data, GLenum type)
     GLuint  index;
     GLint   success;
 
-    LOGI("glCreateShader");
+    LOGI("glCreateShader\n");
     //Compile:
     index = wes_gl->glCreateShader(type);
     LOGI("glCreateShader, index = %d\n", index);
-	 wes_gl->glShaderSource(index, 1, &data, NULL);
+    wes_gl->glShaderSource(index, 1, &data, NULL);
     LOGI("glShaderSource\n");
-    
+
     wes_gl->glCompileShader(index);
     LOGI("glCompileShader\n");
-  
+
     //test status:
     wes_gl->glGetShaderiv(index, GL_COMPILE_STATUS, &success);
-	LOGI("glGetShaderiv\n");
+    LOGI("glGetShaderiv\n");
     if (success){
-	LOGI("shader success\n");
+        LOGI("shader success\n");
         return index;
     } else {
-	LOGI("shader error\n");
+    LOGI("shader error\n");
         wes_shader_error(index);
         wes_gl->glDeleteShader(index);
         return (0xFFFFFFFF);
     }
-
 }
 
 
@@ -728,32 +727,32 @@ wes_shader_init( void )
     sh_program_mod = GL_TRUE;
 
 #ifdef SHADER_FILE
-    //Load file into mem:
+	//Load file into mem:
 	file = fopen(SHADER_FILE, "rb");
-	LOGI("Before shader load");
+	LOGI("Before shader load\n");
 	if (!file){
-	    LOGE("Could not find file: %s", "WES.vsh");
+		LOGE("Could not find file: %s\n", SHADER_FILE);
 	}
- 	fseek(file, 0, SEEK_END);
+	fseek(file, 0, SEEK_END);
 	size = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	data = (char*) malloc(size + 1);
 	if (!data){
-	    LOGE("Could not allocate: %i bytes", size + 1);
-    }
+		LOGE("Could not allocate: %i bytes\n", size + 1);
+	}
 	if (fread(data, sizeof(char), size, file) != size){
-        free(data);
-        LOGE("Could not read file: %s", "WES.vsh");
+		free(data);
+		LOGE("Could not read file: %s\n", SHADER_FILE);
 	}
 	data[size] = '\0';
 	fclose(file);
 
-	LOGI("before shader create");
-    sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
-	LOGI("after shader create");
-    free(data);
+	LOGI("before shader create\n");
+	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+	LOGI("after shader create\n");
+	free(data);
 #else
-	LOGI("Before shader load");
+	LOGI("Before shader load\n");
 
 	sh_vertex = wes_shader_create(wesShaderTestStr, GL_VERTEX_SHADER);
 	if(sh_vertex == 0xFFFFFFFF)
@@ -762,7 +761,7 @@ wes_shader_init( void )
 		sh_fallback = GL_TRUE;
 	}
 
-	LOGI("after shader create");
+	LOGI("after shader create\n");
 #endif
 }
 

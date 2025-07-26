@@ -1,5 +1,5 @@
 /*
-GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -682,7 +682,7 @@ GL_MANGLE(glMultMatrixTransposef)(GLfloat *m)
     wes_vertbuffer_flush();
 
     wes_transpose4(m, tmp);
-    GL_MANGLE(glMultMatrixf)(tmp);
+    GL_MANGLE_NAME(glMultMatrixf)(tmp);
 }
 
 
@@ -881,7 +881,7 @@ GL_MANGLE(glOrthof)(float l, float r, float b, float t, float n, float f)
 
 GLvoid GL_MANGLE(glOrtho) (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)
 {
-	GL_MANGLE(glOrthof)(left,right,bottom,top, zNear,zFar);
+	GL_MANGLE_NAME(glOrthof)(left,right,bottom,top, zNear,zFar);
 }
 GLvoid
 GL_MANGLE(glPushMatrix)( void )
@@ -991,7 +991,7 @@ gluOrtho2D(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top)
 {
     wes_vertbuffer_flush();
 
-    GL_MANGLE(glOrthof)(left, right, bottom, top, -1, 1);
+    GL_MANGLE_NAME(glOrthof)(left, right, bottom, top, -1, 1);
 }
 
 GLvoid
@@ -1090,6 +1090,6 @@ gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
 	tmp[10] = - forward[0] * m_current->data[2] - forward[1] * m_current->data[6] - forward[2] * m_current->data[10];
 	tmp[11] = - forward[0] * m_current->data[3] - forward[1] * m_current->data[7] - forward[2] * m_current->data[11];
     memcpy(m_current->data, tmp, 12 * sizeof(GLfloat));
-    GL_MANGLE(glTranslatef)(-eyex, -eyey, -eyez);
+    GL_MANGLE_NAME(glTranslatef)(-eyex, -eyey, -eyez);
 }
 #endif // WES_ENABLE_GLU
