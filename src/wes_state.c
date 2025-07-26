@@ -1,5 +1,5 @@
 /*
-GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -685,7 +685,7 @@ static GLvoid wes_setstate (GLenum e, GLboolean b)
             }
         default:
 			wes_setstate_old(e,b);
-			//LOGI("Change state: %x not implemented",e);
+			//LOGI("Change state: %x not implemented\n",e);
             break;
     }
         
@@ -720,7 +720,7 @@ static GLboolean wes_getstate (GLenum e)
         case GL_STENCIL_TEST: return GL_FALSE; // UNSUPPORTED!
         case GL_TEXTURE_2D: return u_progstate.uTexture[u_activetex].Enable;
 		default: 
-			// LOGI("glIsEnabled: %x not implemented",e);
+			// LOGI("glIsEnabled: %x not implemented\n",e);
 			return wes_gl->glIsEnabled(e);
             break;
     }
@@ -1167,7 +1167,7 @@ GL_MANGLE(glTexEnvi)(GLenum target, GLenum pname, GLint param)
 
 GLvoid GL_MANGLE(glTexEnvf) (GLenum target, GLenum pname, GLfloat param)
 {
-	GL_MANGLE(glTexEnvi)( target, pname, param );
+	GL_MANGLE_NAME(glTexEnvi)( target, pname, param );
 }
 
 GLvoid

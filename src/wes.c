@@ -1,5 +1,5 @@
 /*
-GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_matrix.h"
 
 #if defined(_WIN32)
+	#define NOMINMAX
     #include <windows.h>
 
 #ifdef WINAPI_FAMILY
@@ -53,8 +54,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     }
 #else
     #define dlopen(A, B)    LoadLibrary(A)
-    #define dlsym(A, B)     GetProcAddress((HINSTANCE__*) A, B)
-    #define dlclose(A)      FreeLibrary((HINSTANCE__*) A)
+    #define dlsym(A, B)     GetProcAddress((HMODULE) A, B)
+    #define dlclose(A)      FreeLibrary((HMODULE) A)
 #endif
 #else
     #define __GNU_SOURCE
@@ -227,24 +228,24 @@ wes_init(const char *gles2)
     int i;
     void** ptr;
 
-    LOGI("Start wes_init()");
+    LOGI("Start wes_init()\n");
 
     wes_gl = (gles2lib_t*) malloc(sizeof(gles2lib_t));
     if (wes_gl == NULL)
     {
-        LOGE("Could not load Allocate mem: %s", gles2);
+        LOGE("Could not load Allocate mem: %s\n", gles2);
     }
 
-	LOGI("Memory alloc wes_init()");
+	LOGI("Memory alloc wes_init()\n");
 #if !defined XASH_SDL && !defined REF_DLL
 	wes_libhandle = dlopen(gles2, RTLD_NOW | RTLD_LOCAL);//RTLD_LAZY | RTLD_GLOBAL);
 
 	if (wes_libhandle == NULL)
     {
-        LOGE("Could not load OpenGL ES 2 runtime library: %s", gles2);
+        LOGE("Could not load OpenGL ES 2 runtime library: %s\n", gles2);
     }
 #endif
-	LOGI("lib loaded wes_init()");
+	LOGI("lib loaded wes_init()\n");
 
     ptr = (void**) wes_gl;
     for(i = 0; i != WES_OGLESV2_FUNCTIONCOUNT+1; i++)
@@ -257,26 +258,27 @@ wes_init(const char *gles2)
 		void* pfunc = (void*) dlsym(wes_libhandle, glfuncnames[i]);
 #endif
         if (pfunc == NULL)
-			LOGE("Could not find %s in %s", glfuncnames[i], gles2 );
-		else LOGI("Loaded %s", glfuncnames[i]);
+			LOGE("Could not find %s in %s\n", glfuncnames[i], gles2 );
+		else
+			LOGI("Loaded %s\n", glfuncnames[i]);
 
         *ptr++ = pfunc;
     }
 
-	LOGI("methods loaded wes_init()");
+	LOGI("methods loaded wes_init()\n");
 
     wes_shader_init();
-	LOGI("wes_shader_init()");
+	LOGI("wes_shader_init()\n");
 
     wes_matrix_init();
-	LOGI("wes_matrix_init()");
+	LOGI("wes_matrix_init()\n");
 
     wes_begin_init();
-	LOGI("wes_begin_init()");
+	LOGI("wes_begin_init()\n");
 
     wes_state_init();
 
-    LOGI("Finished wes_init()");
+    LOGI("Finished wes_init()\n");
 }
 
 GLvoid

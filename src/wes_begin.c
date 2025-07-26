@@ -337,7 +337,7 @@ GLvoid
 GL_MANGLE(glVertex3f)(GLfloat x, GLfloat y, GLfloat z)
 {
     if (vt_possize > 3){
-	GL_MANGLE(glVertex4f)(x, y, z, 1.0);
+	GL_MANGLE_NAME(glVertex4f)(x, y, z, 1.0);
     } else {
         vt_possize = 3;
         vt_current->x = x;
@@ -356,7 +356,7 @@ GL_MANGLE(glVertex3f)(GLfloat x, GLfloat y, GLfloat z)
 GLvoid
 GL_MANGLE(glVertex3fv)(const GLfloat *v)
 {
-	return GL_MANGLE(glVertex3f)(v[0], v[1], v[2]);
+	GL_MANGLE_NAME(glVertex3f)(v[0], v[1], v[2]);
 }
 /*
 GLvoid GL_MANGLE(glBlendFunc)(GLenum sfactor, GLenum dfactor)
@@ -376,7 +376,7 @@ GLvoid GL_MANGLE(glDepthMask)( GLboolean flag )
 
 GLvoid GL_MANGLE(glShadeModel) (GLenum mode)
 {
-	return;
+
 }
 
 GLvoid GL_MANGLE(glPointSize)( GLfloat size )
@@ -390,7 +390,7 @@ GLvoid
 GL_MANGLE(glVertex2f)(GLfloat x, GLfloat y)
 {
     if (vt_possize > 2) {
-	GL_MANGLE(glVertex3f)(x, y, 0.0);
+	GL_MANGLE_NAME(glVertex3f)(x, y, 0.0);
     } else {
         vt_possize = 2;
         vt_current->x = x;
@@ -420,7 +420,7 @@ GLvoid
 GL_MANGLE(glTexCoord3f)(GLfloat s, GLfloat t, GLfloat r)
 {
     if (vt_coordsize[0] > 3){
-	GL_MANGLE(glTexCoord4f)(s, t, r, 0);
+	GL_MANGLE_NAME(glTexCoord4f)(s, t, r, 0);
     } else {
         vt_coordsize[0] = 3;
         vt_current->coord[0].s = s;
@@ -433,7 +433,7 @@ GLvoid
 GL_MANGLE(glTexCoord2f)(GLfloat s, GLfloat t)
 {
     if (vt_coordsize[0] > 2){
-	GL_MANGLE(glTexCoord3f)(s, t, 0);
+	GL_MANGLE_NAME(glTexCoord3f)(s, t, 0);
     } else {
         vt_coordsize[0] = 2;
         vt_current->coord[0].s = s;
@@ -445,7 +445,7 @@ GLvoid
 GL_MANGLE(glTexCoord1f)(GLfloat s)
 {
     if (vt_coordsize[0] > 1){
-	GL_MANGLE(glTexCoord2f)(s, 0);
+	GL_MANGLE_NAME(glTexCoord2f)(s, 0);
     } else {
         vt_coordsize[0] = 1;
         vt_current->coord[0].s = s;
@@ -469,7 +469,7 @@ GL_MANGLE(glMultiTexCoord3f)(GLenum tex, GLfloat s, GLfloat t, GLfloat r)
 {
     GLuint ind = tex - GL_TEXTURE0;
     if (vt_coordsize[ind] > 3){
-	GL_MANGLE(glMultiTexCoord4f)(tex, s, t, r, 1.0);
+	GL_MANGLE_NAME(glMultiTexCoord4f)(tex, s, t, r, 1.0);
     } else {
         vt_coordsize[ind] = 3;
         vt_current->coord[ind].s = s;
@@ -483,7 +483,7 @@ GL_MANGLE(glMultiTexCoord2f)(GLenum tex, GLfloat s, GLfloat t)
 {
     GLuint ind = tex - GL_TEXTURE0;
     if (vt_coordsize[ind] > 2){
-	GL_MANGLE(glMultiTexCoord3f)(tex, s, t, 0.0);
+	GL_MANGLE_NAME(glMultiTexCoord3f)(tex, s, t, 0.0);
     } else {
         vt_coordsize[ind] = 2;
         vt_current->coord[ind].s = s;
@@ -496,7 +496,7 @@ GL_MANGLE(glMultiTexCoord1f)(GLenum tex, GLfloat s)
 {
     GLuint ind = tex - GL_TEXTURE0;
     if (vt_coordsize[ind] > 1){
-	GL_MANGLE(glMultiTexCoord2f)(tex, s, 0.0);
+	GL_MANGLE_NAME(glMultiTexCoord2f)(tex, s, 0.0);
     } else {
         vt_coordsize[ind] = 1;
         vt_current->coord[ind].s = s;
@@ -553,7 +553,7 @@ GLvoid
 GL_MANGLE(glColor3f)(GLfloat r, GLfloat g, GLfloat b)
 {
     if (vt_color0size > 3){
-	GL_MANGLE(glColor4f)(r, g, b, 1);
+	GL_MANGLE_NAME(glColor4f)(r, g, b, 1);
     } else {
         vt_color0size = 3;
         vt_ccurrent->cr0 = r;
@@ -584,14 +584,14 @@ GL_MANGLE(glColor4ub)(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
 GLvoid
 GL_MANGLE(glColor4ubv)( const GLubyte *p )
 {
-	GL_MANGLE(glColor4ub)( p[0], p[1], p[2], p[3] );
+	GL_MANGLE_NAME(glColor4ub)( p[0], p[1], p[2], p[3] );
 }
 
 GLvoid
 GL_MANGLE(glColor3ub)(GLubyte r, GLubyte g, GLubyte b)
 {
     if (vt_color0size > 3){
-	GL_MANGLE(glColor4ub)(r, g, b, 255);
+	GL_MANGLE_NAME(glColor4ub)(r, g, b, 255);
     } else {
         vt_color0size = 3;
         vt_ccurrent->cr0 = r / 255.0f;// * ubtofloat;
@@ -783,7 +783,7 @@ rev=0;
             break;
 
         default:
-		LOGI("%x: uniplemented", vt_mode);
+		LOGI("%x: uniplemented\n", vt_mode);
  		//wes_gl->glDrawArrays(vt_mode, 0, vt_count);
             break;
         }
@@ -1412,16 +1412,16 @@ const GLubyte* GL_MANGLE(glGetString) (GLenum name)
 }
 
 void GL_MANGLE(glGetIntegerv) (GLenum pname, GLint *params)
-	{
+{
 	if( pname ==  0x84E2 ) // GL_MAX_TEXTURE_UNITS_ARB
 		pname = GL_MAX_TEXTURE_IMAGE_UNITS;
 	wes_gl->glGetIntegerv(pname, params);
-	}
+}
 
 void GL_MANGLE(glGetFloatv) (GLenum pname, GLfloat *params)
-	{
+{
 	wes_gl->glGetFloatv(pname, params);
-	}
+}
 
 void GL_MANGLE(glHint)(GLenum target, GLenum mode)
 {
@@ -1433,21 +1433,21 @@ void GL_MANGLE(glHint)(GLenum target, GLenum mode)
 }
 
 void GL_MANGLE(glReadPixels) (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels)
-	{
+{
 	if (format == GL_DEPTH_COMPONENT)
-		{
+	{
 		// OpenglEs 1.1 does not support reading depth buffer without an extension
 		memset(pixels, 0xff,4);
 		return;
-		}
+	}
 	wes_vertbuffer_flush();
 	wes_gl->glReadPixels(x,y,width,height,format,type,pixels);
-	}
+}
 /*
 void GL_MANGLE(glNormal3fv)( const GLfloat *v )
-	{
+{
 	glNormal3f( v[0], v[1], v[2] );
-	}
+}
 */
 /*
 void GL_MANGLE(glCullFace) (GLenum mode)
@@ -1465,36 +1465,36 @@ void GL_MANGLE(glPixelStorei) (GLenum pname, GLint param)
 
 
 void GL_MANGLE(glClear) (GLbitfield mask)
-	{
+{
 	FlushOnStateChange();
 	glEsImpl->glClear(mask);
-	}
+}
 
 
 GLboolean GL_MANGLE(glIsTexture)(GLuint texture)
-	{
+{
 	//FlushOnStateChange();
 	return glEsImpl->glIsTexture(texture);
-	}
+}
 /*
 void glDrawBuffer(GLenum mode)
-	{
-	}
+{
+}
 */
 void GL_MANGLE(glViewport) (GLint x, GLint y, GLsizei width, GLsizei height)
-	{
+{
 	FlushOnStateChange();
 	glEsImpl->glViewport(x,y,width,height);
-	}
+}
 /*
 void glBindTexture (GLenum target, GLuint texture)
-	{
+{
 	glEsImpl->glBindTexture(target, texture);
-	}
+}
 */
 /*
 void glTexParameterf (GLenum target, GLenum pname, GLfloat param)
-	{
+{
 	if (pname == 0x1004) { // GL_TEXTURE_BORDER_COLOR
 		return; // not supported by opengl es
 	}
@@ -1506,21 +1506,21 @@ void glTexParameterf (GLenum target, GLenum pname, GLfloat param)
 
 	FlushOnStateChange();
 	glEsImpl->glTexParameterf(target, pname,param);
-	}
+}
 
 void glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params)
-	{
+{
 	glTexParameterf(target, pname, params[0]);
-	}
+}
 */
 
 
 /*
 void glDeleteTextures( GLsizei n, const GLuint *textures )
-	{
+{
 	FlushOnStateChange();
 	glEsImpl->glDeleteTextures(n,textures);
-	}
+}
 
 
 
@@ -1649,8 +1649,8 @@ void GL_MANGLE(glBindBufferARB)( GLuint target, GLuint index )
 {
 //	if( index && !vbo_bkp_id && !skipnanogl )
 	//	FlushOnStateChange();
-	GL_MANGLE(glDisableClientState)( GL_COLOR_ARRAY );
-	GL_MANGLE(glColor4f)( 1,1,1,1 );
+	GL_MANGLE_NAME(glDisableClientState)( GL_COLOR_ARRAY );
+	GL_MANGLE_NAME(glColor4f)( 1,1,1,1 );
 
 	//if( index && !vbo_bkp_id && !skipnanogl )
 		//wes_vertbuffer_flush();
