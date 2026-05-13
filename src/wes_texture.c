@@ -39,58 +39,60 @@ typedef struct textureformat_s
 textureformat_t *textureformatlist;
 #endif
 GLvoid
-GL_MANGLE(glTexParameteri) (GLenum target, GLenum pname, GLint param)
+GL_MANGLE( glTexParameteri )( GLenum target, GLenum pname, GLint param )
 {
-	if( pname == 0x8191) // GL_GENERATE_MIPMAP
+	if( pname == 0x8191 ) // GL_GENERATE_MIPMAP
 	{
 		need_mipmap = GL_TRUE;
 		return;
 	}
-	if (pname == GL_TEXTURE_BORDER_COLOR)
+	if( pname == GL_TEXTURE_BORDER_COLOR )
 	{
 		return; // not supported by opengl es
 	}
-	if (    (pname == GL_TEXTURE_WRAP_S ||
-			 pname == GL_TEXTURE_WRAP_T) &&
-			 param == GL_CLAMP)   {
-		param = 0x812F;
-	}
-
-	wes_vertbuffer_flush();
-
-	wes_gl->glTexParameteri(target, pname, param);
-}
-
-GLvoid
-GL_MANGLE(glTexParameterf) (GLenum target, GLenum pname, GLfloat param)
-{
-	if (pname == GL_TEXTURE_BORDER_COLOR)
-	{
-		return; // not supported by opengl es
-	}
-	if (    (pname == GL_TEXTURE_WRAP_S ||
-			 pname == GL_TEXTURE_WRAP_T) &&
-			 param == GL_CLAMP)
+	if(( pname == GL_TEXTURE_WRAP_S
+	     || pname == GL_TEXTURE_WRAP_T )
+	   && param == GL_CLAMP )
 	{
 		param = 0x812F;
 	}
 
 	wes_vertbuffer_flush();
 
-	wes_gl->glTexParameterf(target, pname, param);
+	wes_gl->glTexParameteri( target, pname, param );
 }
 
 GLvoid
-GL_MANGLE(glTexParameterfv)(	GLenum target, GLenum pname, const GLfloat *params)
+GL_MANGLE( glTexParameterf )( GLenum target, GLenum pname, GLfloat param )
 {
-	GL_MANGLE_NAME(glTexParameterf)(target, pname, params[0]);
+	if( pname == GL_TEXTURE_BORDER_COLOR )
+	{
+		return; // not supported by opengl es
+	}
+	if(( pname == GL_TEXTURE_WRAP_S
+	     || pname == GL_TEXTURE_WRAP_T )
+	   && param == GL_CLAMP )
+	{
+		param = 0x812F;
+	}
+
+	wes_vertbuffer_flush();
+
+	wes_gl->glTexParameterf( target, pname, param );
+}
+
+GLvoid
+GL_MANGLE( glTexParameterfv )( GLenum target, GLenum pname, const GLfloat *params )
+{
+	GL_MANGLE_NAME( glTexParameterf )( target, pname, params[0] );
 }
 
 static GLvoid
-wes_convert_BGR2RGB(const GLubyte* inb, GLubyte* outb, GLint size)
+wes_convert_BGR2RGB( const GLubyte *inb, GLubyte *outb, GLint size )
 {
 	int i;
-	for(i = 0; i < size; i += 3){
+	for( i = 0; i < size; i += 3 )
+	{
 		outb[i + 2] = inb[i];
 		outb[i + 1] = inb[i + 1];
 		outb[i] = inb[i + 2];
@@ -98,10 +100,11 @@ wes_convert_BGR2RGB(const GLubyte* inb, GLubyte* outb, GLint size)
 }
 
 static GLvoid
-wes_convert_BGRA2RGBA(const GLubyte* inb, GLubyte* outb, GLint size)
+wes_convert_BGRA2RGBA( const GLubyte *inb, GLubyte *outb, GLint size )
 {
 	int i;
-	for(i = 0; i < size; i += 4){
+	for( i = 0; i < size; i += 4 )
+	{
 		outb[i + 2] = inb[i];
 		outb[i + 1] = inb[i + 1];
 		outb[i] = inb[i + 2];
@@ -110,10 +113,11 @@ wes_convert_BGRA2RGBA(const GLubyte* inb, GLubyte* outb, GLint size)
 }
 
 static GLvoid
-wes_clear_alpha(const GLubyte* inb, GLubyte* outb, GLint size)
+wes_clear_alpha( const GLubyte *inb, GLubyte *outb, GLint size )
 {
 	int i;
-	for(i = 0; i < size; i += 4){
+	for( i = 0; i < size; i += 4 )
+	{
 		outb[i] = inb[i];
 		outb[i + 1] = inb[i + 1];
 		outb[i + 2] = inb[i + 2];
@@ -122,169 +126,180 @@ wes_clear_alpha(const GLubyte* inb, GLubyte* outb, GLint size)
 }
 
 static GLvoid
-wes_convert_I2LA(const GLubyte* inb, GLubyte* outb, GLint size)
+wes_convert_I2LA( const GLubyte *inb, GLubyte *outb, GLint size )
 {
 	int i;
-	for(i = 0; i < size; i += 1){
-		outb[i*2 + 1] = outb[i*2] = inb[i];
+	for( i = 0; i < size; i += 1 )
+	{
+		outb[i * 2 + 1] = outb[i * 2] = inb[i];
 	}
 }
 
 GLvoid
-GL_MANGLE(glTexImage2D)(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
-		   GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+GL_MANGLE( glTexImage2D )( GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
+			   GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {
-	//wes_vertbuffer_flush(); //?
+	// wes_vertbuffer_flush(); //?
 
-	GLvoid* data = (GLvoid*) pixels;
+	GLvoid *data = (GLvoid *) pixels;
 
 	/* conversion routines */
-	if (format == GL_BGR){
-		data = (GLvoid*) malloc(width * height * 3);
-		wes_convert_BGR2RGB((GLubyte*) pixels, (GLubyte*) data, width * height * 3);
+	if( format == GL_BGR )
+	{
+		data = (GLvoid *) malloc( width * height * 3 );
+		wes_convert_BGR2RGB((GLubyte *) pixels, (GLubyte *) data, width * height * 3 );
 		format = GL_RGB;
-	} else if (format == GL_BGRA){
-		data = (GLvoid*) malloc(width * height * 4);
-		wes_convert_BGRA2RGBA((GLubyte*) pixels, (GLubyte*) data, width * height * 4);
+	}
+	else if( format == GL_BGRA )
+	{
+		data = (GLvoid *) malloc( width * height * 4 );
+		wes_convert_BGRA2RGBA((GLubyte *) pixels, (GLubyte *) data, width * height * 4 );
 		format = GL_RGBA;
-	} else if (format == GL_INTENSITY){
-		data = (GLvoid*) malloc(width * height * 2);
-		wes_convert_I2LA((GLubyte*) pixels, (GLubyte*) data, width * height * 2);
+	}
+	else if( format == GL_INTENSITY )
+	{
+		data = (GLvoid *) malloc( width * height * 2 );
+		wes_convert_I2LA((GLubyte *) pixels, (GLubyte *) data, width * height * 2 );
 		format = GL_LUMINANCE_ALPHA;
 	}
 
 	if( pixels && format == GL_RGBA && (
-		internalFormat == GL_RGB ||
-		internalFormat == GL_RGB8 ||
-		internalFormat == GL_RGB5 ||
-		internalFormat == GL_LUMINANCE ||
-		internalFormat == GL_LUMINANCE8 ||
-		internalFormat == GL_LUMINANCE4 )) // strip alpha from texture
+		    internalFormat == GL_RGB
+		    || internalFormat == GL_RGB8
+		    || internalFormat == GL_RGB5
+		    || internalFormat == GL_LUMINANCE
+		    || internalFormat == GL_LUMINANCE8
+		    || internalFormat == GL_LUMINANCE4 )) // strip alpha from texture
 	{
-		GLvoid *data2 = malloc(width * height * 4);
+		GLvoid *data2 = malloc( width * height * 4 );
 
-		wes_clear_alpha((GLubyte*) pixels, (GLubyte*) data2, width * height * 4);
+		wes_clear_alpha((GLubyte *) pixels, (GLubyte *) data2, width * height * 4 );
 		if( data != pixels )
-			free(data);
+			free( data );
 		data = data2;
 	}
 
-	wes_gl->glTexImage2D(target, level, format, width, height, 0, format, type, data);
+	wes_gl->glTexImage2D( target, level, format, width, height, 0, format, type, data );
 
-	if (data != pixels)
-		free(data);
+	if( data != pixels )
+		free( data );
 
 	if( need_mipmap )
 	{
-		wes_gl->glGenerateMipmap(target);
+		wes_gl->glGenerateMipmap( target );
 		need_mipmap = GL_FALSE;
 	}
 }
 
 
-GLvoid GL_MANGLE(glTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE( glTexSubImage2D )( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels )
 {
-	wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+	wes_gl->glTexSubImage2D( target, level, xoffset, yoffset, width, height, format, type, pixels );
 
 	if( need_mipmap )
 	{
-		wes_gl->glGenerateMipmap(target);
+		wes_gl->glGenerateMipmap( target );
 		need_mipmap = GL_FALSE;
 	}
 }
 
 
-void GL_MANGLE(glCopyTexImage2D)( GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border )
+void GL_MANGLE( glCopyTexImage2D )( GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border )
 {
-	wes_gl->glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+	wes_gl->glCopyTexImage2D( target, level, internalformat, x, y, width, height, border );
 }
 
 
-GLvoid GL_MANGLE(glTexImage1D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE( glTexImage1D )( GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {
-    GL_MANGLE_NAME(glTexImage2D)(GL_TEXTURE_2D, level, internalformat,  width, 1, border, format, type, pixels);
+	GL_MANGLE_NAME( glTexImage2D )( GL_TEXTURE_2D, level, internalformat, width, 1, border, format, type, pixels );
 }
 
-GLvoid GL_MANGLE(glTexImage3D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE( glTexImage3D )( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {
-    GL_MANGLE_NAME(glTexImage2D)(GL_TEXTURE_2D, level, internalformat,  width, height, border, format, type, pixels);
+	GL_MANGLE_NAME( glTexImage2D )( GL_TEXTURE_2D, level, internalformat, width, height, border, format, type, pixels );
 }
 
-GLvoid GL_MANGLE(glTexSubImage1D)( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
+GLvoid GL_MANGLE( glTexSubImage1D )( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
 {
-    wes_gl->glTexSubImage2D(target,level,xoffset,0,width,1,format,type,pixels);
+	wes_gl->glTexSubImage2D( target, level, xoffset, 0, width, 1, format, type, pixels );
 }
 
-GLvoid GL_MANGLE(glTexSubImage3D)( GLenum target, GLint level,
-                                         GLint xoffset, GLint yoffset,
-                                         GLint zoffset, GLsizei width,
-                                         GLsizei height, GLsizei depth,
-                                         GLenum format,
-                                         GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE( glTexSubImage3D )( GLenum target, GLint level,
+				     GLint xoffset, GLint yoffset,
+				     GLint zoffset, GLsizei width,
+				     GLsizei height, GLsizei depth,
+				     GLenum format,
+				     GLenum type, const GLvoid *pixels )
 {
-    wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+	wes_gl->glTexSubImage2D( target, level, xoffset, yoffset, width, height, format, type, pixels );
 }
 
 
 #ifdef WES_ENABLE_GLU
 static GLvoid
-wes_halveimage(GLint nw, GLint nh, GLint byteperpixel, char* data, char* newdata)
+wes_halveimage( GLint nw, GLint nh, GLint byteperpixel, char *data, char *newdata )
 {
-    int i, j;
-    for(i = 0; i < nw; i++){
-        for(j = 0; j < nh; j++){
-            memcpy(&newdata[(i + j * nw) * byteperpixel], &data[(i + j * nw *2) * 2*byteperpixel], byteperpixel);
-        }
-    }
+	int i, j;
+	for( i = 0; i < nw; i++ )
+	{
+		for( j = 0; j < nh; j++ )
+		{
+			memcpy( &newdata[( i + j * nw ) * byteperpixel], &data[( i + j * nw * 2 ) * 2 * byteperpixel], byteperpixel );
+		}
+	}
 }
 
 GLvoid
-gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height,
-                GLenum format, GLenum type, const GLvoid *pixels )
+gluBuild2DMipmaps( GLenum target, GLint components, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels )
 {
-    int i = 1;
-    GLuint byteperpixel = 0;
-    char *data = NULL, *newdata = NULL;
-    switch(type)
-    {
-        case GL_UNSIGNED_BYTE:
-            byteperpixel = components;
-            break;
+	int    i = 1;
+	GLuint byteperpixel = 0;
+	char   *data = NULL, *newdata = NULL;
+	switch( type )
+	{
+	case GL_UNSIGNED_BYTE:
+		byteperpixel = components;
+		break;
 
-        case GL_UNSIGNED_SHORT_4_4_4_4:
-        case GL_UNSIGNED_SHORT_5_5_5_1:
-        case GL_UNSIGNED_SHORT_5_6_5:
-            byteperpixel = 2;
-            break;
-    }
+	case GL_UNSIGNED_SHORT_4_4_4_4:
+	case GL_UNSIGNED_SHORT_5_5_5_1:
+	case GL_UNSIGNED_SHORT_5_6_5:
+		byteperpixel = 2;
+		break;
+	}
 
-    if (byteperpixel == 0)
-    {
-        return;
-    }
+	if( byteperpixel == 0 )
+	{
+		return;
+	}
 
-    GL_MANGLE_NAME(glTexImage2D)(target, 0, format, width, height, 0, format, type, pixels);
+	GL_MANGLE_NAME( glTexImage2D )( target, 0, format, width, height, 0, format, type, pixels );
 
-    data = (char*) malloc(width * height * byteperpixel);
-    memcpy(data, pixels, width * height * byteperpixel);
-    while(width != 1 || height != 1){
-        width  >>= 1;
-        height >>= 1;
-        if (width == 0) width = 1;
-        if (height == 0) height = 1;
-        newdata = (char*) malloc(width * height * byteperpixel);
-        wes_halveimage(width, height, byteperpixel, data, newdata);
-	GL_MANGLE_NAME(glTexImage2D)(target, i++, format, width, height, 0, format, type, newdata);
-        free(data);
-        data = newdata;
-    }
+	data = (char *) malloc( width * height * byteperpixel );
+	memcpy( data, pixels, width * height * byteperpixel );
+	while( width != 1 || height != 1 )
+	{
+		width >>= 1;
+		height >>= 1;
+		if( width == 0 )
+			width = 1;
+		if( height == 0 )
+			height = 1;
+		newdata = (char *) malloc( width * height * byteperpixel );
+		wes_halveimage( width, height, byteperpixel, data, newdata );
+		GL_MANGLE_NAME( glTexImage2D )( target, i++, format, width, height, 0, format, type, newdata );
+		free( data );
+		data = newdata;
+	}
 
-    if (newdata != NULL)
-        free(newdata);
+	if( newdata != NULL )
+		free( newdata );
 }
+
 #endif // WES_ENABLE_GLU
 
-void GL_MANGLE(glGenTextures)( GLsizei n, GLuint* textures )
+void GL_MANGLE( glGenTextures )( GLsizei n, GLuint *textures )
 {
-    wes_gl->glGenTextures( n, textures );
+	wes_gl->glGenTextures( n, textures );
 }

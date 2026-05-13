@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_matrix.h"
 #include "wes_fragment.h"
 
-#define WES_PBUFFER_SIZE    128
+#define WES_PBUFFER_SIZE 128
 
 const char *wesShaderTestStr = "/*\n\
 		gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper\n\
@@ -364,9 +364,9 @@ const char *wesShaderTestStr = "/*\n\
 		}\n\
 ";
 
-GLboolean	sh_fallback;
-const char *wesShaderFallbackStr =
-	"attribute highp vec4 	aPosition;\n\
+GLboolean  sh_fallback;
+const char *wesShaderFallbackStr
+	= "attribute highp vec4 	aPosition;\n\
 	attribute lowp vec4 	aColor;\n\
 	attribute mediump vec4 	aTexCoord0;\n\
 	attribute mediump vec4 	aTexCoord1;\n\
@@ -407,287 +407,302 @@ const char *wesShaderFallbackStr =
 
 
 
-//shader global variables:
-program_t       *sh_program;
-GLboolean       sh_program_mod;
-program_t       sh_pbuffer[WES_PBUFFER_SIZE];
-GLuint          sh_pbuffer_count;
-GLuint          sh_vertex;
+// shader global variables:
+program_t *sh_program;
+GLboolean sh_program_mod;
+program_t sh_pbuffer[WES_PBUFFER_SIZE];
+GLuint    sh_pbuffer_count;
+GLuint    sh_vertex;
 
-//function declarations:
+// function declarations:
 static GLvoid
-wes_shader_error(GLuint ind)
+wes_shader_error( GLuint ind )
 {
-    int len;
-    char* log;
-    int i;
-    wes_gl->glGetShaderiv(ind, GL_INFO_LOG_LENGTH, &len);
-    log = (char*) malloc(len + 1);
-    memset(log, 0, len+1);
-    wes_gl->glGetShaderInfoLog(ind, len, &i, log);
-    PRINT_ERROR("Shader Error: %s\n", log);
-    free(log);
+	int  len;
+	char *log;
+	int  i;
+	wes_gl->glGetShaderiv( ind, GL_INFO_LOG_LENGTH, &len );
+	log = (char *) malloc( len + 1 );
+	memset( log, 0, len + 1 );
+	wes_gl->glGetShaderInfoLog( ind, len, &i, log );
+	PRINT_ERROR( "Shader Error: %s\n", log );
+	free( log );
 }
 
 static GLvoid
-wes_program_error(GLuint ind)
+wes_program_error( GLuint ind )
 {
-    int len;
-    char* log;
-    int i;
-    wes_gl->glGetProgramiv(ind, GL_INFO_LOG_LENGTH, &len);
-    log = (char*) malloc(len * sizeof(char));
-    wes_gl->glGetProgramInfoLog(ind, len, &i, log);
-    PRINT_ERROR("Program Error: %s\n", log);
-    free(log);
+	int  len;
+	char *log;
+	int  i;
+	wes_gl->glGetProgramiv( ind, GL_INFO_LOG_LENGTH, &len );
+	log = (char *) malloc( len * sizeof( char ));
+	wes_gl->glGetProgramInfoLog( ind, len, &i, log );
+	PRINT_ERROR( "Program Error: %s\n", log );
+	free( log );
 }
 
 static GLuint
-wes_shader_create(const char* data, GLenum type)
+wes_shader_create( const char *data, GLenum type )
 {
-    GLuint  index;
-    GLint   success;
+	GLuint index;
+	GLint  success;
 
-    LOGI("glCreateShader\n");
-    //Compile:
-    index = wes_gl->glCreateShader(type);
-    LOGI("glCreateShader, index = %d\n", index);
-    wes_gl->glShaderSource(index, 1, &data, NULL);
-    LOGI("glShaderSource\n");
+	LOGI( "glCreateShader\n" );
+	// Compile:
+	index = wes_gl->glCreateShader( type );
+	LOGI( "glCreateShader, index = %d\n", index );
+	wes_gl->glShaderSource( index, 1, &data, NULL );
+	LOGI( "glShaderSource\n" );
 
-    wes_gl->glCompileShader(index);
-    LOGI("glCompileShader\n");
+	wes_gl->glCompileShader( index );
+	LOGI( "glCompileShader\n" );
 
-    //test status:
-    wes_gl->glGetShaderiv(index, GL_COMPILE_STATUS, &success);
-    LOGI("glGetShaderiv\n");
-    if (success){
-        LOGI("shader success\n");
-        return index;
-    } else {
-    LOGI("shader error\n");
-        wes_shader_error(index);
-        wes_gl->glDeleteShader(index);
-        return (0xFFFFFFFF);
-    }
+	// test status:
+	wes_gl->glGetShaderiv( index, GL_COMPILE_STATUS, &success );
+	LOGI( "glGetShaderiv\n" );
+	if( success )
+	{
+		LOGI( "shader success\n" );
+		return index;
+	}
+	else
+	{
+		LOGI( "shader error\n" );
+		wes_shader_error( index );
+		wes_gl->glDeleteShader( index );
+		return( 0xFFFFFFFF );
+	}
 }
 
-
 static GLvoid
-wes_attrib_loc(GLuint prog)
+wes_attrib_loc( GLuint prog )
 {
-    wes_gl->glBindAttribLocation(prog, WES_APOS,       "aPosition");
-    wes_gl->glBindAttribLocation(prog, WES_ATEXCOORD0, "aTexCoord0");
-    wes_gl->glBindAttribLocation(prog, WES_ATEXCOORD1, "aTexCoord1");
-    wes_gl->glBindAttribLocation(prog, WES_ATEXCOORD2, "aTexCoord2");
-    wes_gl->glBindAttribLocation(prog, WES_ATEXCOORD3, "aTexCoord3");
-    wes_gl->glBindAttribLocation(prog, WES_ANORMAL,    "aNormal");
-    wes_gl->glBindAttribLocation(prog, WES_AFOGCOORD,  "aFogCoord");
-    wes_gl->glBindAttribLocation(prog, WES_ACOLOR0,    "aColor");
-    wes_gl->glBindAttribLocation(prog, WES_ACOLOR1,    "aColor2nd");
+	wes_gl->glBindAttribLocation( prog, WES_APOS, "aPosition" );
+	wes_gl->glBindAttribLocation( prog, WES_ATEXCOORD0, "aTexCoord0" );
+	wes_gl->glBindAttribLocation( prog, WES_ATEXCOORD1, "aTexCoord1" );
+	wes_gl->glBindAttribLocation( prog, WES_ATEXCOORD2, "aTexCoord2" );
+	wes_gl->glBindAttribLocation( prog, WES_ATEXCOORD3, "aTexCoord3" );
+	wes_gl->glBindAttribLocation( prog, WES_ANORMAL, "aNormal" );
+	wes_gl->glBindAttribLocation( prog, WES_AFOGCOORD, "aFogCoord" );
+	wes_gl->glBindAttribLocation( prog, WES_ACOLOR0, "aColor" );
+	wes_gl->glBindAttribLocation( prog, WES_ACOLOR1, "aColor2nd" );
 }
 
-
-
 static GLvoid
-wes_uniform_loc(program_t *p)
+wes_uniform_loc( program_t *p )
 {
-#define LocateUniform(A)                                                \
-    p->uloc.A = wes_gl->glGetUniformLocation(p->prog, #A);
-#define LocateUniformIndex(A, B, I)                                    \
-    sprintf(str, #A "[%i]" #B, I);                                     \
-    p->uloc.A[I]B = wes_gl->glGetUniformLocation(p->prog, str);
+#define LocateUniform( A ) \
+	p->uloc.A = wes_gl->glGetUniformLocation( p->prog, #A );
+#define LocateUniformIndex( A, B, I )	 \
+	sprintf( str, #A "[%i]" #B, I ); \
+	p->uloc.A[I] B = wes_gl->glGetUniformLocation( p->prog, str );
 
-    int i;
-    char str[256];
+	int  i;
+	char str[256];
 
-    LocateUniform(uEnableRescaleNormal);
-    LocateUniform(uEnableNormalize);
-    for(i = 0; i != WES_MULTITEX_NUM; i++)  {
-        LocateUniformIndex(uEnableTextureGen, ,i);
-    }
-    for(i = 0; i != WES_CLIPPLANE_NUM; i++){
-        LocateUniformIndex(uEnableClipPlane, ,i);
-    }
+	LocateUniform( uEnableRescaleNormal );
+	LocateUniform( uEnableNormalize );
+	for( i = 0; i != WES_MULTITEX_NUM; i++ )
+	{
+		LocateUniformIndex( uEnableTextureGen, , i );
+	}
+	for( i = 0; i != WES_CLIPPLANE_NUM; i++ )
+	{
+		LocateUniformIndex( uEnableClipPlane, , i );
+	}
 
-    LocateUniform(uEnableFog);
-    LocateUniform(uEnableFogCoord);
-    LocateUniform(uEnableLighting);
-    for(i = 0; i != WES_LIGHT_NUM; i++){
-        LocateUniformIndex(uEnableLight, , i);
-        LocateUniformIndex(uLight, .Position, i);
-        LocateUniformIndex(uLight, .Attenuation, i);
-        LocateUniformIndex(uLight, .ColorAmbient, i);
-        LocateUniformIndex(uLight, .ColorDiffuse, i);
-        LocateUniformIndex(uLight, .ColorSpec, i);
-        LocateUniformIndex(uLight, .SpotDir, i);
-        LocateUniformIndex(uLight, .SpotVar, i);
-    }
+	LocateUniform( uEnableFog );
+	LocateUniform( uEnableFogCoord );
+	LocateUniform( uEnableLighting );
+	for( i = 0; i != WES_LIGHT_NUM; i++ )
+	{
+		LocateUniformIndex( uEnableLight, , i );
+		LocateUniformIndex( uLight, .Position, i );
+		LocateUniformIndex( uLight, .Attenuation, i );
+		LocateUniformIndex( uLight, .ColorAmbient, i );
+		LocateUniformIndex( uLight, .ColorDiffuse, i );
+		LocateUniformIndex( uLight, .ColorSpec, i );
+		LocateUniformIndex( uLight, .SpotDir, i );
+		LocateUniformIndex( uLight, .SpotVar, i );
+	}
 
-    LocateUniform(uLightModel.ColorAmbient);
-    LocateUniform(uLightModel.TwoSided);
-    LocateUniform(uLightModel.LocalViewer);
-    LocateUniform(uLightModel.ColorControl);
-    LocateUniform(uRescaleFactor);
+	LocateUniform( uLightModel.ColorAmbient );
+	LocateUniform( uLightModel.TwoSided );
+	LocateUniform( uLightModel.LocalViewer );
+	LocateUniform( uLightModel.ColorControl );
+	LocateUniform( uRescaleFactor );
 
-    for(i = 0; i < 2; i++){
-        LocateUniformIndex(uMaterial, .ColorAmbient, i);
-        LocateUniformIndex(uMaterial, .ColorDiffuse, i);
-        LocateUniformIndex(uMaterial, .ColorSpec, i);
-        LocateUniformIndex(uMaterial, .ColorEmissive, i);
-        LocateUniformIndex(uMaterial, .SpecExponent, i);
-        LocateUniformIndex(uMaterial, .ColorMaterial, i);
-    }
+	for( i = 0; i < 2; i++ )
+	{
+		LocateUniformIndex( uMaterial, .ColorAmbient, i );
+		LocateUniformIndex( uMaterial, .ColorDiffuse, i );
+		LocateUniformIndex( uMaterial, .ColorSpec, i );
+		LocateUniformIndex( uMaterial, .ColorEmissive, i );
+		LocateUniformIndex( uMaterial, .SpecExponent, i );
+		LocateUniformIndex( uMaterial, .ColorMaterial, i );
+	}
 
-    LocateUniform(uFogMode);
-    LocateUniform(uFogDensity);
-    LocateUniform(uFogStart);
-    LocateUniform(uFogEnd);
-    LocateUniform(uFogColor);
+	LocateUniform( uFogMode );
+	LocateUniform( uFogDensity );
+	LocateUniform( uFogStart );
+	LocateUniform( uFogEnd );
+	LocateUniform( uFogColor );
 
-    for(i = 0; i != WES_CLIPPLANE_NUM; i++){
-        LocateUniformIndex(uClipPlane, ,i);
-    }
+	for( i = 0; i != WES_CLIPPLANE_NUM; i++ )
+	{
+		LocateUniformIndex( uClipPlane, , i );
+	}
 
-    LocateUniform(uMVP);
-    LocateUniform(uMV);
-    LocateUniform(uMVIT);
-    LocateUniform(uAlphaRef);
+	LocateUniform( uMVP );
+	LocateUniform( uMV );
+	LocateUniform( uMVIT );
+	LocateUniform( uAlphaRef );
 
-    for(i = 0; i != WES_MULTITEX_NUM; i++){
-        LocateUniformIndex(uTexUnit, , i);
-        LocateUniformIndex(uTexEnvColor, , i);
-    }
+	for( i = 0; i != WES_MULTITEX_NUM; i++ )
+	{
+		LocateUniformIndex( uTexUnit, , i );
+		LocateUniformIndex( uTexEnvColor, , i );
+	}
 
 #undef LocateUniform
 #undef LocateUniformIndex
 }
 
 static GLuint
-wes_program_create(GLuint frag, GLuint vert)
+wes_program_create( GLuint frag, GLuint vert )
 {
-    GLuint  prog;
-    GLint   success;
+	GLuint prog;
+	GLint  success;
 
-    //Create & attach
-    prog = wes_gl->glCreateProgram();
-    wes_gl->glAttachShader(prog, frag);
-    wes_gl->glAttachShader(prog, vert);
-    wes_gl->glLinkProgram(prog);
+	// Create & attach
+	prog = wes_gl->glCreateProgram();
+	wes_gl->glAttachShader( prog, frag );
+	wes_gl->glAttachShader( prog, vert );
+	wes_gl->glLinkProgram( prog );
 
-    //check status:
-    wes_gl->glGetProgramiv(prog, GL_LINK_STATUS, &success);
-    if (!(success || wes_gl->glGetError())){
-        wes_program_error(prog);
-        wes_gl->glDeleteProgram(prog);
-        return (0xFFFFFFFF);
-    }
+	// check status:
+	wes_gl->glGetProgramiv( prog, GL_LINK_STATUS, &success );
+	if( !( success || wes_gl->glGetError()))
+	{
+		wes_program_error( prog );
+		wes_gl->glDeleteProgram( prog );
+		return( 0xFFFFFFFF );
+	}
 
-    wes_attrib_loc(prog);
-    wes_gl->glLinkProgram(prog);
+	wes_attrib_loc( prog );
+	wes_gl->glLinkProgram( prog );
 
-    //check status:
-    wes_gl->glGetProgramiv(prog, GL_LINK_STATUS, &success);
-    if (success || wes_gl->glGetError()){
-        return prog;
-    } else {
-        wes_program_error(prog);
-        wes_gl->glDeleteProgram(prog);
-        return (0xFFFFFFFF);
-    }
+	// check status:
+	wes_gl->glGetProgramiv( prog, GL_LINK_STATUS, &success );
+	if( success || wes_gl->glGetError())
+	{
+		return prog;
+	}
+	else
+	{
+		wes_program_error( prog );
+		wes_gl->glDeleteProgram( prog );
+		return( 0xFFFFFFFF );
+	}
 }
 
 static GLvoid
-wes_build_program( progstate_t *s, program_t *p)
+wes_build_program( progstate_t *s, program_t *p )
 {
-    char frag[4096];
-    memset(frag, 0, 4096);
-    wes_frag_build(frag, s);
-    p->isbound = GL_FALSE;
-    p->pstate = *s;
-    p->vert = sh_vertex;
-    p->frag = wes_shader_create(frag, GL_FRAGMENT_SHADER);
-    p->prog = wes_program_create(p->frag, p->vert);
-    wes_uniform_loc(p);
+	char frag[4096];
+	memset( frag, 0, 4096 );
+	wes_frag_build( frag, s );
+	p->isbound = GL_FALSE;
+	p->pstate = *s;
+	p->vert = sh_vertex;
+	p->frag = wes_shader_create( frag, GL_FRAGMENT_SHADER );
+	p->prog = wes_program_create( p->frag, p->vert );
+	wes_uniform_loc( p );
 }
 
 static GLboolean
-wes_progstate_cmp(progstate_t* s0, progstate_t* s1)
+wes_progstate_cmp( progstate_t *s0, progstate_t *s1 )
 {
-    GLint i, j;
+	GLint i, j;
 
-    if (s0->uEnableAlphaTest != s1->uEnableAlphaTest)
-        return 1;
+	if( s0->uEnableAlphaTest != s1->uEnableAlphaTest )
+		return 1;
 
-    if (s0->uEnableAlphaTest && (s0->uAlphaFunc != s1->uAlphaFunc))
-        return 1;
+	if( s0->uEnableAlphaTest && ( s0->uAlphaFunc != s1->uAlphaFunc ))
+		return 1;
 
-    if (s0->uEnableFog != s1->uEnableFog)
-        return 1;
+	if( s0->uEnableFog != s1->uEnableFog )
+		return 1;
 
-    if (s0->uEnableClipPlane != s1->uEnableClipPlane)
-        return 1;
+	if( s0->uEnableClipPlane != s1->uEnableClipPlane )
+		return 1;
 
-    for(i = 0; i != WES_MULTITEX_NUM; i++)
-    {
-		if (s0->uTexture[i].Enable != s1->uTexture[i].Enable)
+	for( i = 0; i != WES_MULTITEX_NUM; i++ )
+	{
+		if( s0->uTexture[i].Enable != s1->uTexture[i].Enable )
 			return 1;
-		else if (s0->uTexture[i].Enable){
+		else if( s0->uTexture[i].Enable )
+		{
 
-            if (s0->uTexture[i].Mode != s1->uTexture[i].Mode)
-                return 1;
+			if( s0->uTexture[i].Mode != s1->uTexture[i].Mode )
+				return 1;
 
-            if (s0->uTexture[i].Mode == WES_FUNC_COMBINE)
-            {
-                if (s0->uTexture[i].RGBCombine != s1->uTexture[i].RGBCombine)
-                    return 1;
-                if (s0->uTexture[i].AlphaCombine != s1->uTexture[i].AlphaCombine)
-                    return 1;
-				if (s0->uTexture[i].RGBScale != s1->uTexture[i].RGBScale)
+			if( s0->uTexture[i].Mode == WES_FUNC_COMBINE )
+			{
+				if( s0->uTexture[i].RGBCombine != s1->uTexture[i].RGBCombine )
+					return 1;
+				if( s0->uTexture[i].AlphaCombine != s1->uTexture[i].AlphaCombine )
+					return 1;
+				if( s0->uTexture[i].RGBScale != s1->uTexture[i].RGBScale )
 					return 1;
 
-                for(j = 0; j != 3; j++){
-                    if (s0->uTexture[i].Arg[j].RGBSrc != s1->uTexture[i].Arg[j].RGBSrc)
-                        return 1;
-                    if (s0->uTexture[i].Arg[j].RGBOp != s1->uTexture[i].Arg[j].RGBOp)
-                        return 1;
-                    if (s0->uTexture[i].Arg[j].AlphaSrc != s1->uTexture[i].Arg[j].AlphaSrc)
-                        return 1;
-                    if (s0->uTexture[i].Arg[j].AlphaOp != s1->uTexture[i].Arg[j].AlphaOp)
-                        return 1;
-                    }
-            }
-        }
-    }
+				for( j = 0; j != 3; j++ )
+				{
+					if( s0->uTexture[i].Arg[j].RGBSrc != s1->uTexture[i].Arg[j].RGBSrc )
+						return 1;
+					if( s0->uTexture[i].Arg[j].RGBOp != s1->uTexture[i].Arg[j].RGBOp )
+						return 1;
+					if( s0->uTexture[i].Arg[j].AlphaSrc != s1->uTexture[i].Arg[j].AlphaSrc )
+						return 1;
+					if( s0->uTexture[i].Arg[j].AlphaOp != s1->uTexture[i].Arg[j].AlphaOp )
+						return 1;
+				}
+			}
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 GLvoid
-wes_bind_program(program_t *p)
+wes_bind_program( program_t *p )
 {
-    if (p->isbound) return;
-    if (sh_program) sh_program->isbound = GL_FALSE;
-    sh_program_mod = GL_TRUE;
-    sh_program = p;
-    sh_program->isbound = GL_TRUE;
-    wes_gl->glUseProgram(sh_program->prog);
+	if( p->isbound )
+		return;
+	if( sh_program )
+		sh_program->isbound = GL_FALSE;
+	sh_program_mod = GL_TRUE;
+	sh_program = p;
+	sh_program->isbound = GL_TRUE;
+	wes_gl->glUseProgram( sh_program->prog );
 }
-//#define SHADER_FILE "WES.vsh"
+
+// #define SHADER_FILE "WES.vsh"
 
 GLvoid
-wes_choose_program(progstate_t *s)
+wes_choose_program( progstate_t *s )
 {
 	unsigned int i, j;
-    program_t *p;
-    for(i = 0; i < sh_pbuffer_count; i++)
-    {
-        if (!wes_progstate_cmp(s, &sh_pbuffer[i].pstate))
-        {
-            if (sh_program != &sh_pbuffer[i])
-            {
-                p = &sh_pbuffer[i];
-                wes_bind_program(p);
+	program_t    *p;
+	for( i = 0; i < sh_pbuffer_count; i++ )
+	{
+		if( !wes_progstate_cmp( s, &sh_pbuffer[i].pstate ))
+		{
+			if( sh_program != &sh_pbuffer[i] )
+			{
+				p = &sh_pbuffer[i];
+				wes_bind_program( p );
 				/*
 				fprintf(stdout, "===== Choose Fragment Shader =====\n");
 				for(j = 0; j < WES_MULTITEX_NUM; j++){
@@ -700,83 +715,83 @@ wes_choose_program(progstate_t *s)
 						fprintf(stdout, "TEX%i ALPHA OP = [%i, %i, %i] \n", j, s->uTexture[j].Arg[0].AlphaOp, s->uTexture[j].Arg[1].AlphaOp,s->uTexture[j].Arg[2].AlphaOp);
 					}
 				}*/
-            }
-            return;
-        }
-    }
+			}
+			return;
+		}
+	}
 
-    p = &sh_pbuffer[sh_pbuffer_count];
-    wes_build_program(s, p);
-    wes_bind_program(p);
-    sh_pbuffer_count++;
+	p = &sh_pbuffer[sh_pbuffer_count];
+	wes_build_program( s, p );
+	wes_bind_program( p );
+	sh_pbuffer_count++;
 
-    if (sh_pbuffer_count == WES_PBUFFER_SIZE){
-        PRINT_ERROR("Exceeded Maximum Programs!");
-    }
+	if( sh_pbuffer_count == WES_PBUFFER_SIZE )
+	{
+		PRINT_ERROR( "Exceeded Maximum Programs!" );
+	}
 
 }
 
 GLvoid
 wes_shader_init( void )
 {
-    FILE*           file;
-    unsigned int    size;
-    char*           data;
+	FILE *file;
+	unsigned int size;
+	char *data;
 
-    sh_pbuffer_count = 0;
-    sh_program_mod = GL_TRUE;
+	sh_pbuffer_count = 0;
+	sh_program_mod = GL_TRUE;
 
 #ifdef SHADER_FILE
-	//Load file into mem:
-	file = fopen(SHADER_FILE, "rb");
-	LOGI("Before shader load\n");
-	if (!file){
-		LOGE("Could not find file: %s\n", SHADER_FILE);
+	// Load file into mem:
+	file = fopen( SHADER_FILE, "rb" );
+	LOGI( "Before shader load\n" );
+	if( !file )
+	{
+		LOGE( "Could not find file: %s\n", SHADER_FILE );
 	}
-	fseek(file, 0, SEEK_END);
-	size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	data = (char*) malloc(size + 1);
-	if (!data){
-		LOGE("Could not allocate: %i bytes\n", size + 1);
+	fseek( file, 0, SEEK_END );
+	size = ftell( file );
+	fseek( file, 0, SEEK_SET );
+	data = (char *) malloc( size + 1 );
+	if( !data )
+	{
+		LOGE( "Could not allocate: %i bytes\n", size + 1 );
 	}
-	if (fread(data, sizeof(char), size, file) != size){
-		free(data);
-		LOGE("Could not read file: %s\n", SHADER_FILE);
+	if( fread( data, sizeof( char ), size, file ) != size )
+	{
+		free( data );
+		LOGE( "Could not read file: %s\n", SHADER_FILE );
 	}
 	data[size] = '\0';
-	fclose(file);
+	fclose( file );
 
-	LOGI("before shader create\n");
-	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
-	LOGI("after shader create\n");
-	free(data);
+	LOGI( "before shader create\n" );
+	sh_vertex = wes_shader_create( data, GL_VERTEX_SHADER );
+	LOGI( "after shader create\n" );
+	free( data );
 #else
-	LOGI("Before shader load\n");
+	LOGI( "Before shader load\n" );
 
-	sh_vertex = wes_shader_create(wesShaderTestStr, GL_VERTEX_SHADER);
-	if(sh_vertex == 0xFFFFFFFF)
+	sh_vertex = wes_shader_create( wesShaderTestStr, GL_VERTEX_SHADER );
+	if( sh_vertex == 0xFFFFFFFF )
 	{
-		sh_vertex = wes_shader_create(wesShaderFallbackStr, GL_VERTEX_SHADER);
+		sh_vertex = wes_shader_create( wesShaderFallbackStr, GL_VERTEX_SHADER );
 		sh_fallback = GL_TRUE;
 	}
 
-	LOGI("after shader create\n");
+	LOGI( "after shader create\n" );
 #endif
 }
-
 
 GLvoid
 wes_shader_destroy( void )
 {
-    unsigned int i;
-    wes_gl->glDeleteShader(sh_vertex);
-    for(i = 0; i < sh_pbuffer_count; i++)
-    {
-        wes_gl->glDeleteShader(sh_pbuffer[i].frag);
-        wes_gl->glDeleteProgram(sh_pbuffer[i].prog);
-    }
+	unsigned int i;
+	wes_gl->glDeleteShader( sh_vertex );
+	for( i = 0; i < sh_pbuffer_count; i++ )
+	{
+		wes_gl->glDeleteShader( sh_pbuffer[i].frag );
+		wes_gl->glDeleteProgram( sh_pbuffer[i].prog );
+	}
 }
-
-
-

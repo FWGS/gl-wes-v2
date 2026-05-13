@@ -19,6 +19,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 
-extern void wes_context_open(unsigned int w, unsigned int h, unsigned int vsync);
+extern void wes_context_open( unsigned int w, unsigned int h, unsigned int vsync );
 extern void wes_context_update( void );
 extern void wes_context_close( void );
