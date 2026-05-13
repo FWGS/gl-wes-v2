@@ -693,7 +693,7 @@ wes_bind_program( program_t *p )
 GLvoid
 wes_choose_program( progstate_t *s )
 {
-	unsigned int i, j;
+	unsigned int i;
 	program_t    *p;
 	for( i = 0; i < sh_pbuffer_count; i++ )
 	{
@@ -735,14 +735,13 @@ wes_choose_program( progstate_t *s )
 GLvoid
 wes_shader_init( void )
 {
-	FILE *file;
-	unsigned int size;
-	char *data;
-
 	sh_pbuffer_count = 0;
 	sh_program_mod = GL_TRUE;
 
 #ifdef SHADER_FILE
+	FILE *file;
+	unsigned int size;
+	char *data;
 	// Load file into mem:
 	file = fopen( SHADER_FILE, "rb" );
 	LOGI( "Before shader load\n" );
