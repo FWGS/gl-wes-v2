@@ -292,11 +292,8 @@ wes_begin_init( void )
 GLvoid
 wes_begin_destroy( void )
 {
-	if( !nano_extensions_string )
-	{
-		free( nano_extensions_string );
-		nano_extensions_string = NULL;
-	}
+	free( nano_extensions_string );
+	nano_extensions_string = NULL;
 }
 
 GLvoid
@@ -676,8 +673,9 @@ GLvoid
 GL_MANGLE( glEnd )( void )
 {
 
-	if( vt_count < 3 )
+	if( vt_count - vt_mark < 3 )
 	{
+		vt_count = vt_mark;
 		return;
 	}
 
@@ -685,17 +683,18 @@ GL_MANGLE( glEnd )( void )
 	{
 	case GL_QUADS:
 	{
-		// int i;
-		// int num = (vt_count-vt_mark) / 4;
-		// for(i = 0; i < num; i += 1){
-		vt_ibuffer[vt_vertcount++] = vt_indexcount;
-		vt_ibuffer[vt_vertcount++] = vt_indexcount + 1;
-		vt_ibuffer[vt_vertcount++] = vt_indexcount + 2;
-		vt_ibuffer[vt_vertcount++] = vt_indexcount;       // 2
-		vt_ibuffer[vt_vertcount++] = vt_indexcount + 2;   // 3
-		vt_ibuffer[vt_vertcount++] = vt_indexcount + 3;   // 0
-		vt_indexcount += 4;
-		// }
+		int i;
+		int num = ( vt_count - vt_mark ) / 4;
+		for( i = 0; i < num; i += 1 )
+		{
+			vt_ibuffer[vt_vertcount++] = vt_indexcount;
+			vt_ibuffer[vt_vertcount++] = vt_indexcount + 1;
+			vt_ibuffer[vt_vertcount++] = vt_indexcount + 2;
+			vt_ibuffer[vt_vertcount++] = vt_indexcount;
+			vt_ibuffer[vt_vertcount++] = vt_indexcount + 2;
+			vt_ibuffer[vt_vertcount++] = vt_indexcount + 3;
+			vt_indexcount += 4;
+		}
 	}
 	break;
 	case GL_TRIANGLES:
@@ -841,8 +840,8 @@ GL_MANGLE( glEnd )( void )
 	break;
 
 	default:
-		LOGI( "%x: uniplemented\n", vt_mode );
-		// wes_gl->glDrawArrays(vt_mode, 0, vt_count);
+		LOGI( "%x: unimplemented\n", vt_mode );
+		vt_count = vt_mark;
 		break;
 	}
 
@@ -1468,7 +1467,10 @@ GLenum GL_MANGLE( glGetError )( void )
 	return wes_gl->glGetError(); // GL_NO_ERROR;
 }
 
-GLvoid GL_MANGLE( glLineWidth )( GLfloat width ) {
+GLvoid GL_MANGLE( glLineWidth )( GLfloat width )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glLineWidth( width );
 }
 
 /*
@@ -1491,15 +1493,30 @@ void GL_MANGLE( glArrayElement )( GLint i ) {
 }
 void GL_MANGLE( glCallList )( GLuint list ) {
 }
-void GL_MANGLE( glColorMask )( GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha ) {
+void GL_MANGLE( glColorMask )( GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glColorMask( red, green, blue, alpha );
 }
-void GL_MANGLE( glStencilFunc )( GLenum func, GLint ref, GLuint mask ) {
+void GL_MANGLE( glStencilFunc )( GLenum func, GLint ref, GLuint mask )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glStencilFunc( func, ref, mask );
 }
-void GL_MANGLE( glStencilOp )( GLenum fail, GLenum zfail, GLenum zpass ) {
+void GL_MANGLE( glStencilOp )( GLenum fail, GLenum zfail, GLenum zpass )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glStencilOp( fail, zfail, zpass );
 }
-void GL_MANGLE( glStencilMask )( GLuint mask ) {
+void GL_MANGLE( glStencilMask )( GLuint mask )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glStencilMask( mask );
 }
-void GL_MANGLE( glClearStencil )( GLint s ) {
+void GL_MANGLE( glClearStencil )( GLint s )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glClearStencil( s );
 }
 
 const GLubyte *GL_MANGLE( glGetString )( GLenum name )

@@ -1056,46 +1056,46 @@ GL_MANGLE( glPushMatrix )( void )
 	switch( m_mode )
 	{
 	case GL_MODELVIEW:
-		for( i = 0; i < m_modelview_num; i++ )
-		{
-			m_modelview[i + 1] = m_modelview[i];
-		}
-		if( m_modelview_num < ( WES_MODELVIEW_NUM - 1 ))
+		if( m_modelview_num < WES_MODELVIEW_NUM )
 		{
 			m_modelview_num++;
+		}
+		for( i = m_modelview_num - 1; i > 0; i-- )
+		{
+			m_modelview[i] = m_modelview[i - 1];
 		}
 		break;
 
 	case GL_PROJECTION:
-		for( i = 0; i < m_projection_num; i++ )
-		{
-			m_projection[i + 1] = m_projection[i];
-		}
-		if( m_projection_num < ( WES_PROJECTION_NUM - 1 ))
+		if( m_projection_num < WES_PROJECTION_NUM )
 		{
 			m_projection_num++;
+		}
+		for( i = m_projection_num - 1; i > 0; i-- )
+		{
+			m_projection[i] = m_projection[i - 1];
 		}
 		break;
 
 	case GL_TEXTURE:
-		for( i = 0; i < m_texture_num; i++ )
-		{
-			m_texture[i + 1] = m_texture[i];
-		}
-		if( m_texture_num < ( WES_TEXTURE_NUM - 1 ))
+		if( m_texture_num < WES_TEXTURE_NUM )
 		{
 			m_texture_num++;
+		}
+		for( i = m_texture_num - 1; i > 0; i-- )
+		{
+			m_texture[i] = m_texture[i - 1];
 		}
 		break;
 
 	case GL_COLOR:
-		for( i = 0; i < m_color_num; i++ )
-		{
-			m_color[i + 1] = m_color[i];
-		}
-		if( m_color_num < ( WES_TEXTURE_NUM - 1 ))
+		if( m_color_num < WES_COLOR_NUM )
 		{
 			m_color_num++;
+		}
+		for( i = m_color_num - 1; i > 0; i-- )
+		{
+			m_color[i] = m_color[i - 1];
 		}
 		break;
 

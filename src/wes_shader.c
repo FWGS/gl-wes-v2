@@ -720,16 +720,23 @@ wes_choose_program( progstate_t *s )
 		}
 	}
 
-	p = &sh_pbuffer[sh_pbuffer_count];
-	wes_build_program( s, p );
-	wes_bind_program( p );
-	sh_pbuffer_count++;
-
 	if( sh_pbuffer_count == WES_PBUFFER_SIZE )
 	{
-		PRINT_ERROR( "Exceeded Maximum Programs!" );
-	}
+		static GLuint evict;
 
+		PRINT_ERROR( "Exceeded Maximum Programs!" );
+		p = &sh_pbuffer[evict];
+		if( ++evict == WES_PBUFFER_SIZE )
+			evict = 0;
+		wes_gl->glDeleteShader( p->frag );
+		wes_gl->glDeleteProgram( p->prog );
+	}
+	else
+	{
+		p = &sh_pbuffer[sh_pbuffer_count++];
+	}
+	wes_build_program( s, p );
+	wes_bind_program( p );
 }
 
 GLvoid

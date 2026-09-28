@@ -237,7 +237,9 @@ wes_init( const char *gles2 )
 	if( wes_gl == NULL )
 	{
 		LOGE( "Could not load Allocate mem: %s\n", gles2 );
+		return;
 	}
+	memset( wes_gl, 0, sizeof( gles2lib_t ));
 
 	LOGI( "Memory alloc wes_init()\n" );
 #if !defined XASH_SDL && !defined REF_DLL
@@ -251,7 +253,7 @@ wes_init( const char *gles2 )
 	LOGI( "lib loaded wes_init()\n" );
 
 	ptr = (void **) wes_gl;
-	for( i = 0; i != WES_OGLESV2_FUNCTIONCOUNT + 1; i++ )
+	for( i = 0; i < (int)( sizeof( glfuncnames ) / sizeof( glfuncnames[0] )); i++ )
 	{
 #ifdef REF_DLL
 		void *pfunc = GL_GetProcAddress( glfuncnames[i] );
@@ -287,7 +289,11 @@ wes_init( const char *gles2 )
 GLvoid
 wes_destroy( void )
 {
-	dlclose( wes_libhandle );
+	if( wes_libhandle )
+	{
+		dlclose( wes_libhandle );
+		wes_libhandle = NULL;
+	}
 	wes_shader_destroy();
 	wes_begin_destroy();
 }
@@ -323,5 +329,6 @@ GL_MANGLE( glMultiDrawElements )( GLenum mode, GLsizei *count, GLenum type, GLvo
 GLvoid
 GL_MANGLE( glScissor )( GLint x, GLint y, GLsizei width, GLsizei height )
 {
+	wes_vertbuffer_flush();
 	wes_gl->glScissor( x, y, width, height );
 }
